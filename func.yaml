@@ -2,7 +2,7 @@ schema_version: 20180708
 name: fn-weather
 version: 0.0.1
 runtime: java
-cmd: com.example.fn.HelloFunction::handleRequest
+cmd: com.example.fn.WeatherFunction:handleRequest
 format: http-stream
 triggers:
 - name: fn-weather-trigger
