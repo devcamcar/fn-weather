@@ -18,9 +18,9 @@ def handler(ctx, data: io.BytesIO=None):
     try:
         body = json.loads(data.getvalue())
         city = body.get("city")
-    except (Exception, ValueError) as ex:
-        print(str(ex))
-        return {"error": "No city name specified"}
+    except (Exception, ValueError):
+        # return {"error": "No city name specified"}
+        return {body}
 
     url = "%s?key=%s&q=%s" % (API_URL, API_KEY, urllib.parse.quote_plus(data))
 
@@ -42,7 +42,7 @@ def handler(ctx, data: io.BytesIO=None):
     # TODO: Publish message to the Slack channel.
     # https://github.com/slackapi/python-slackclient
 
-    return {"success"}
+    return {"temp_f": forecast["current"]["temp_f"]}
 
 if __name__ == "__main__":
     # handler(None, data="Los Angeles")
