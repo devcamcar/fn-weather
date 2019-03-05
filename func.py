@@ -18,7 +18,8 @@ def handler(ctx, data: io.BytesIO=None):
     try:
         body = json.loads(data.getvalue())
         city = body.get("city")
-    except (Exception, ValueError):
+    except (Exception, ValueError) as ex:
+        print(str(ex))
         # return {"error": "No city name specified"}
         return {body}
 
