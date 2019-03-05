@@ -1,21 +1,25 @@
 import fdk
+import io
 import json
 import sys
 import urllib
 import urllib.request
 
-API_URL  = "http://api.apixu.com/v1/current.json"
-API_KEY  = "518cb86fff374394bf5211954190103"
 
-SLACK_OAUTH_TOKEN     = "xoxp-555960845936-557777884263-565774371219-cdf818d0ac21fa07775922fba9de4f34"
-SLACK_BOT_OAUTH_TOKEN = "xoxb-555960845936-566965908039-PaeQ9sTDlBuTjs6R2sHXcvd7"
+API_URL = "http://api.apixu.com/v1/current.json"
+API_KEY = "518cb86fff374394bf5211954190103"
 
 # TODO: Configure URL endpoint for Slack Bot.
 # https://api.slack.com/bot-users
 # https://api.slack.com/events-api#events_api_request_urls
 
-def handler(ctx, data=None, loop=None):
-    if not data or len(data) == 0:
+
+def handler(ctx, data: io.BytesIO=None):
+    try:
+        body = json.loads(data.getvalue())
+        city = body.get("city")
+    except (Exception, ValueError) as ex:
+        print(str(ex))
         return {"error": "No city name specified"}
 
     url = "%s?key=%s&q=%s" % (API_URL, API_KEY, urllib.parse.quote_plus(data))
@@ -33,15 +37,15 @@ def handler(ctx, data=None, loop=None):
                forecast["current"]["condition"]["text"],
                forecast["current"]["temp_f"])
 
-    print (message)
+    print(message)
 
     # TODO: Publish message to the Slack channel.
     # https://github.com/slackapi/python-slackclient
-    
+
     return {"success"}
 
 if __name__ == "__main__":
-    #handler(None, data="Los Angeles")
+    # handler(None, data="Los Angeles")
     fdk.handle(handler)
 
 """
