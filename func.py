@@ -1,6 +1,7 @@
 import fdk
 import io
 import json
+import logging
 import sys
 import urllib
 import urllib.request
@@ -17,19 +18,19 @@ API_KEY = "518cb86fff374394bf5211954190103"
 def handler(ctx, data: io.BytesIO=None):
     try:
         body = json.loads(data.getvalue())
+        logging.debug(str(body))
         city = body.get("city")
     except (Exception, ValueError) as ex:
-        print(str(ex))
-        # return {"error": "No city name specified"}
-        return {body}
+        logging.error(str(ex))
+        return {"error": "No city name specified"}
 
-    url = "%s?key=%s&q=%s" % (API_URL, API_KEY, urllib.parse.quote_plus(data))
+    url = "%s?key=%s&q=%s" % (API_URL, API_KEY, urllib.parse.quote_plus(city))
 
     try:
         with urllib.request.urlopen(url) as response:
             forecast = json.loads(response.read())
-    except Exception as e:
-        print("error: ", e)
+    except Exception:
+        logging.exception("Unable to fetch weather data")
         return {"error": e}
 
     # Determine how to show the image in Slack.
@@ -38,7 +39,7 @@ def handler(ctx, data: io.BytesIO=None):
                forecast["current"]["condition"]["text"],
                forecast["current"]["temp_f"])
 
-    print(message)
+    logging.info(message)
 
     # TODO: Publish message to the Slack channel.
     # https://github.com/slackapi/python-slackclient
@@ -46,6 +47,7 @@ def handler(ctx, data: io.BytesIO=None):
     return {"temp_f": forecast["current"]["temp_f"]}
 
 if __name__ == "__main__":
+
     # handler(None, data="Los Angeles")
     fdk.handle(handler)
 
