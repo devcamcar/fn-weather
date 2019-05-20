@@ -29,7 +29,7 @@ def handler(ctx, data: io.BytesIO=None):
     try:
         with urllib.request.urlopen(url) as response:
             forecast = json.loads(response.read())
-    except Exception:
+    except Exception as e:
         logging.exception("Unable to fetch weather data")
         return {"error": e}
 
